@@ -2,16 +2,18 @@
 from __future__ import print_function
 import argparse
 import csv
+import numpy
 
 import chainer
 import chainer.functions as F
 import chainer.links as L
 from chainer import training
 from chainer.training import extensions
+from chainer.datasets import tuple_dataset
 
-N_IN  = 24
-N_OUT = 2
-TRAIN_FILE = './train.csv'
+N_IN  = 25 # in
+N_OUT = 2  # out
+TRAIN_FILE = './train.csv' # training file
 
 # Network definition
 class MLP(chainer.Chain):
@@ -29,19 +31,24 @@ class MLP(chainer.Chain):
         h2 = F.relu(self.l2(h1))
         return self.l3(h2)
 
+# Training data class
 class TrainData():
     def __init__(self, train_file):
         self.train_file = train_file
 
-    def convert_to_nparray(self):
-        data = np.empty((0, N_IN), np.float32)
-        target = np.empty((0, 1), np.int32)
+    def convert_to_dataset(self):
+        data = []
+        target = []
         with open(self.train_file, 'r') as f:
             reader = csv.reader(f, delimiter=',')
             for columns in reader:
-                target = np.append(target, columns[0])
-                data = np.append(data, np.array(columns[1:]))
-        return data, target
+                target.append(columns[0])
+                data.append(columns[1:])
+        # convert to numpy arrays
+        data = numpy.array(data, dtype=numpy.float32)
+        target = numpy.array(target, dtype=numpy.int32)
+        # returns with a dataset format preferred by chainer
+        return tuple_dataset.TupleDataset(data, target)
 
 def main():
     parser = argparse.ArgumentParser(description='Chainer example: sprecog')
@@ -76,7 +83,7 @@ def main():
 
     # Load the sprecog dataset
     train_data = TrainData(TRAIN_FILE)
-    train = train_data.convert_to_nparray()
+    train = train_data.convert_to_dataset()
     test = train
 
     train_iter = chainer.iterators.SerialIterator(train, args.batchsize)
