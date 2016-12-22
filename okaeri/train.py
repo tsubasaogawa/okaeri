@@ -14,6 +14,8 @@ from chainer.datasets import tuple_dataset
 N_IN  = 25 # in
 N_OUT = 2  # out
 TRAIN_FILE = './train.csv' # training file
+MODEL_FILE = './train.model'
+OPT_FILE   = './train.optimizer'
 
 # Network definition
 class MLP(chainer.Chain):
@@ -108,10 +110,6 @@ def main():
     trainer.extend(extensions.LogReport())
 
     # Print selected entries of the log to stdout
-    # Here "main" refers to the target link of the "main" optimizer again, and
-    # "validation" refers to the default name of the Evaluator extension.
-    # Entries other than 'epoch' are reported by the Classifier link, called by
-    # either the updater or the evaluator.
     trainer.extend(extensions.PrintReport(
         ['epoch', 'main/loss', 'validation/main/loss',
          'main/accuracy', 'validation/main/accuracy', 'elapsed_time']))
@@ -125,6 +123,10 @@ def main():
 
     # Run the training
     trainer.run()
+
+    # Save the model
+    chainer.serializers.save_npz(MODEL_FILE, model)
+    chainer.serializers.save_npz(OPT_FILE, optimizer)
 
 if __name__ == '__main__':
     main()
