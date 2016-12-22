@@ -6,12 +6,13 @@ LDIR1    = $(JDIR)/libjulius
 LDIR2    = $(JDIR)/libsent
 LIBS     = `$(JDIR)/libjulius/libjulius-config --libs` `$(JDIR)/libsent/libsent-config --libs` 
 DEFINES  = `$(JDIR)/libjulius/libjulius-config --cflags` `$(JDIR)/libsent/libsent-config --cflags` 
+PROGNAME = okaeri_kanojo
 
-all : out_okaeri_param.jpi
+all : $(PROGNAME).jpi
 
-out_okaeri_param.jpi : out_okaeri_param.o
-	$(CC) -shared -o out_okaeri_param.jpi out_okaeri_param.o -L$(LDIR1) -L$(LDIR2) $(LIBS)
+$(PROGNAME).jpi : $(PROGNAME).o
+	$(CC) -shared -o $(PROGNAME).jpi $(PROGNAME).o -L$(LDIR1) -L$(LDIR2) $(LIBS)
 
-out_okaeri_param.o : out_okaeri_param.c
-	$(CC) -c out_okaeri_param.c -Wall -I$(IDIR1) -I$(IDIR2) $(DEFINES)
+$(PROGNAME).o : $(PROGNAME).c
+	$(CC) -c $(PROGNAME).c -Wall -I$(IDIR1) -I$(IDIR2) $(DEFINES)
 

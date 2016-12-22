@@ -12,14 +12,14 @@ from chainer import training
 from chainer.training import extensions
 from chainer.datasets import tuple_dataset
 
+import play_okaeri
+
 N_IN  = 25 # in
 N_OUT = 2  # out
 MODEL_FILE = './train.model'
-OPT_FILE   = './train.optimizer'
 
 # Network definition
 class MLP(chainer.Chain):
-
     def __init__(self, n_in, n_units, n_out):
         super(MLP, self).__init__(
             # the size of the inputs to each layer will be inferred
@@ -33,7 +33,7 @@ class MLP(chainer.Chain):
         h2 = F.relu(self.l2(h1))
         return self.l3(h2)
 
-# Training data class
+# Test data class
 class TestData():
     def __init__(self, test_file):
         self.test_file = test_file
@@ -49,21 +49,13 @@ class TestData():
         # convert to numpy arrays
         data = numpy.array(data, dtype=numpy.float32)
         target = numpy.array(target, dtype=numpy.int32)
-        # returns with a dataset format preferred by chainer
+        # returns with a dataset format liked by model.predictor()
         return data, target
 
 def main():
     parser = argparse.ArgumentParser(description='Chainer example: sprecog')
-    parser.add_argument('--batchsize', '-b', type=int, default=100,
-                        help='Number of images in each mini-batch')
-    parser.add_argument('--epoch', '-e', type=int, default=20,
-                        help='Number of sweeps over the dataset to train')
     parser.add_argument('--gpu', '-g', type=int, default=-1,
                         help='GPU ID (negative value indicates CPU)')
-    parser.add_argument('--out', '-o', default='result',
-                        help='Directory to output the result')
-    parser.add_argument('--resume', '-r', default='',
-                        help='Resume the training from snapshot')
     parser.add_argument('--unit', '-u', type=int, default=1000,
                         help='Number of units')
     parser.add_argument('--testfile', '-t', default='',
@@ -72,8 +64,6 @@ def main():
 
     print('GPU: {}'.format(args.gpu))
     print('# unit: {}'.format(args.unit))
-    print('# Minibatch-size: {}'.format(args.batchsize))
-    print('# epoch: {}'.format(args.epoch))
     print('# test-file: {}'.format(args.testfile))
     print('')
 
@@ -82,11 +72,6 @@ def main():
         chainer.cuda.get_device(args.gpu).use()  # Make a specified GPU current
         model.to_gpu()  # Copy the model to the GPU
     chainer.serializers.load_npz(MODEL_FILE, model)
-
-    # Setup an optimizer
-    optimizer = chainer.optimizers.Adam()
-    optimizer.setup(model)
-    chainer.serializers.load_npz(OPT_FILE, optimizer)
 
     # Load the sprecog dataset
     test_data = TestData(args.testfile)
@@ -97,6 +82,7 @@ def main():
     prediction = numpy.argmax(v.data)
     print("label: ", label, "predict: ", prediction);
     if label[0] == prediction:
+      play_okaeri.play()
       sys.exit(0)
     else:
       sys.exit(1)

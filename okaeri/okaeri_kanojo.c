@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <sys/wait.h>
 #include "julius/juliuslib.h"
 #include "plugin_defs.h"
 
@@ -50,7 +49,6 @@ void output_result(Recog *recog, void *dummy) {
   int mfcclen = recog->lmlist->am->mfcc->param->veclen;
   float *avg_mfcc;
   char result[MAX_RESULT_LEN], mfcc_csv_name[256], classification_cmd[256];
-  int ret_classification;
 
   /* 認識結果取得 */
   for(r=recog->process_list; r; r=r->next) {
@@ -68,7 +66,7 @@ void output_result(Recog *recog, void *dummy) {
 
   /* 認識結果判定 */
   if(strstr(result, "ただいま") != NULL) {
-    printf("tadaima\n");
+    printf("tadaima ok\n");
   }
 #if ALWAYS_OUT_MFCC_TO_FILE != 1
   else {
@@ -100,15 +98,14 @@ void output_result(Recog *recog, void *dummy) {
 		  dt_data->tm_hour, dt_data->tm_min, dt_data->tm_sec);
   output_mfccs_to_csv(mfcc_csv_name, avg_mfcc, mfcclen);
 
-  /* 識別器を呼ぶ 次は、実際にコンパイルして動かしてみる*/
+  /* 話者認識器を呼ぶ. おかえり音声もここで再生される */
   sprintf(classification_cmd, "%s --testfile=%s", CLASSIFIER_FILE, mfcc_csv_name);
-  ret_classification = system(classification_cmd);
+  system(classification_cmd);
 
-  /* 判定 */
-  if(WEXITSTATUS(ret_classification) == 0) {
-    system(OKAERI_CMD);
-  }
   free(avg_mfcc);
+#if ALWAYS_OUT_MFCC_TO_FILE != 1
+  remove(mfcc_csv_name);
+#endif
 }
 
 void output_mfccs_to_csv(char *filename, float *mfcc, int len) {
