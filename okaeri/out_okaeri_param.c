@@ -10,6 +10,7 @@
 #define MAX_RESULT_LEN 2048
 #define ALWAYS_OUT_MFCC_TO_FILE 1
 #define CLASSIFIER_FILE "./classify.py"
+#define OKAERI_CMD "aplay ./voice-okaeri-yasashime.wav"
 
 /* プロトタイプコール */
 int startup(void *data);
@@ -105,7 +106,7 @@ void output_result(Recog *recog, void *dummy) {
 
   /* 判定 */
   if(WEXITSTATUS(ret_classification) == 0) {
-    printf("yes!\n");
+    system(OKAERI_CMD);
   }
   free(avg_mfcc);
 }
