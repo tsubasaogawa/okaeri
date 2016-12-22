@@ -5,11 +5,10 @@
 #include "julius/juliuslib.h"
 #include "plugin_defs.h"
 
-#define PLUGIN_TITLE "A Feature Extractor for Okaeri Kanojo"
+#define PLUGIN_TITLE "Okaeri Kanojo"
 #define MAX_RESULT_LEN 2048
-#define ALWAYS_OUT_MFCC_TO_FILE 1
+#define ALWAYS_OUT_MFCC_TO_FILE 1 /* 特徴量ファイルを常に作成するか */
 #define CLASSIFIER_FILE "./classify.py"
-#define OKAERI_CMD "aplay ./voice-okaeri-yasashime.wav"
 
 /* プロトタイプコール */
 int startup(void *data);
@@ -62,6 +61,7 @@ void output_result(Recog *recog, void *dummy) {
       printf("%s ", winfo->woutput[wid[i]]);
       sprintf(result, "%s%s", result, winfo->woutput[wid[i]]);
     }
+    printf("\n");
   }
 
   /* 認識結果判定 */
@@ -99,7 +99,7 @@ void output_result(Recog *recog, void *dummy) {
   output_mfccs_to_csv(mfcc_csv_name, avg_mfcc, mfcclen);
 
   /* 話者認識器を呼ぶ. おかえり音声もここで再生される */
-  sprintf(classification_cmd, "%s --testfile=%s", CLASSIFIER_FILE, mfcc_csv_name);
+  sprintf(classification_cmd, CLASSIFIER_FILE "--testfile=%s", mfcc_csv_name);
   system(classification_cmd);
 
   free(avg_mfcc);
