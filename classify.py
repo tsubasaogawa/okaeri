@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# coding: utf-8
+
 # okaeri-kanojo classifier
 
 from __future__ import print_function
@@ -11,33 +13,18 @@ import math
 import numpy
 
 import chainer
-import chainer.functions as F
 import chainer.links as L
 from chainer import training
 from chainer.training import extensions
 from chainer.datasets import tuple_dataset
 
+import mlp
 import play_okaeri
 
 N_IN  = 25 # in
 N_OUT = 2  # out
 DEFAULT_UNIT = 500
 MODEL_FILE = './train.model'
-
-# Network definition
-class MLP(chainer.Chain):
-    def __init__(self, n_in, n_units, n_out):
-        super(MLP, self).__init__(
-            # the size of the inputs to each layer will be inferred
-            l1=L.Linear(n_in, n_units),  # n_in -> n_units
-            l2=L.Linear(n_units, n_units),  # n_units -> n_units
-            l3=L.Linear(n_units, n_out),  # n_units -> n_out
-        )
-
-    def __call__(self, x):
-        h1 = F.relu(self.l1(x))
-        h2 = F.relu(self.l2(h1))
-        return self.l3(h2)
 
 # Test data class
 class TestData():
@@ -74,7 +61,7 @@ def main():
 
     print('# test-file: {}'.format(args.testfile))
 
-    model = L.Classifier(MLP(N_IN, args.unit, N_OUT))
+    model = L.Classifier(mlp.MLP(N_IN, args.unit, N_OUT))
     if args.gpu >= 0:
         chainer.cuda.get_device(args.gpu).use()  # Make a specified GPU current
         model.to_gpu()  # Copy the model to the GPU
