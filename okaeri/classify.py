@@ -1,8 +1,11 @@
 #!/usr/bin/env python
+
 from __future__ import print_function
 import sys
+import os
 import argparse
 import csv
+import math
 import numpy
 
 import chainer
@@ -80,7 +83,8 @@ def main():
     # Classification
     v = model.predictor(test)
     prediction = numpy.argmax(v.data)
-    print("label: ", label, "predict: ", prediction);
+    print("label: ", label[0], "predict: ", prediction)
+
     if label[0] == prediction:
       play_okaeri.play()
       sys.exit(0)

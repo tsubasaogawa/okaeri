@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+
+# tadaima training script
+
 from __future__ import print_function
 import argparse
 import csv
@@ -15,11 +18,10 @@ N_IN  = 25 # in
 N_OUT = 2  # out
 TRAIN_FILE = './train.csv' # training file
 MODEL_FILE = './train.model'
-OPT_FILE   = './train.optimizer'
+# OPT_FILE   = './train.optimizer'
 
 # Network definition
 class MLP(chainer.Chain):
-
     def __init__(self, n_in, n_units, n_out):
         super(MLP, self).__init__(
             # the size of the inputs to each layer will be inferred
@@ -126,7 +128,7 @@ def main():
 
     # Save the model
     chainer.serializers.save_npz(MODEL_FILE, model)
-    chainer.serializers.save_npz(OPT_FILE, optimizer)
+    # chainer.serializers.save_npz(OPT_FILE, optimizer)
 
 if __name__ == '__main__':
     main()
