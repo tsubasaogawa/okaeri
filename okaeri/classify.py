@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# okaeri-kanojo classifier
+
 from __future__ import print_function
 import sys
 import os
@@ -56,7 +58,7 @@ class TestData():
         return data, target
 
 def main():
-    parser = argparse.ArgumentParser(description='Chainer example: sprecog')
+    parser = argparse.ArgumentParser(description='okaeri kanojo classifier')
     parser.add_argument('--gpu', '-g', type=int, default=-1,
                         help='GPU ID (negative value indicates CPU)')
     parser.add_argument('--unit', '-u', type=int, default=1000,
@@ -65,10 +67,7 @@ def main():
                         help='Input test file')
     args = parser.parse_args()
 
-    print('GPU: {}'.format(args.gpu))
-    print('# unit: {}'.format(args.unit))
     print('# test-file: {}'.format(args.testfile))
-    print('')
 
     model = L.Classifier(MLP(N_IN, args.unit, N_OUT))
     if args.gpu >= 0:
@@ -76,16 +75,17 @@ def main():
         model.to_gpu()  # Copy the model to the GPU
     chainer.serializers.load_npz(MODEL_FILE, model)
 
-    # Load the sprecog dataset
+    # Load the dataset
     test_data = TestData(args.testfile)
     test, label = test_data.convert_to_dataset()
 
     # Classification
     v = model.predictor(test)
     prediction = numpy.argmax(v.data)
-    print("label: ", label[0], "predict: ", prediction)
+    print("okaeri_kanojo: classification: label=", label[0], "predict=", prediction)
 
     if label[0] == prediction:
+      print("okaeri_kanojo: classification: okaeried")
       play_okaeri.play()
       sys.exit(0)
     else:
