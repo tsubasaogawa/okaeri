@@ -9,6 +9,7 @@
 #define MAX_RESULT_LEN 2048
 #define ALWAYS_OUT_MFCC_TO_FILE 0 /* 特徴量ファイルを常に作成するか. 1 にすると話者認識が行われない */
 #define CLASSIFIER_FILE "python classify.py"
+#define CLASSIFIER_PARAM "--unit=500"
 #define OKAERI_CLASS 0
 
 /* プロトタイプコール */
@@ -21,6 +22,7 @@ void output_test_data_csv(char *filename, int cls, float *mfcc, int len);
 int startup(void *data) {
   Recog *recog = data;
   callback_add(recog, CALLBACK_RESULT, output_result, NULL);  
+  setvbuf(stdout, 0, _IONBF, 0);
   return 0;
 }
 
@@ -48,13 +50,13 @@ void output_result(Recog *recog, void *dummy) {
   float **mfcc = recog->lmlist->am->mfcc->param->parvec;
   int mfcclen = recog->lmlist->am->mfcc->param->veclen;
   float *avg_mfcc;
-  char result[MAX_RESULT_LEN], test_csv_name[256];
+  char ph_prog_result[256], ph_result[MAX_RESULT_LEN], test_csv_name[256];
 #if ALWAYS_OUT_MFCC_TO_FILE != 1
   char classification_cmd[256];
 #endif
-
+  
   /* 認識結果取得 */
-  result[0] = '\0';
+  ph_result[0] = '\0';
   for(r=recog->process_list; r; r=r->next) {
     if(! r->live || r->result.status < 0) continue;
 
@@ -64,16 +66,16 @@ void output_result(Recog *recog, void *dummy) {
     wid = sent->word;
 
     for(i=0; i<sent->word_num; i++) { 
-      printf("%s ", winfo->woutput[wid[i]]);
-      sprintf(result, "%s%s", result, winfo->woutput[wid[i]]);
+      for(j=0; j<winfo->wlen[wid[i]]; j++) {
+        center_name(winfo->wseq[wid[i]][j]->name, ph_prog_result);
+        sprintf(ph_result, "%s%s", ph_result, ph_prog_result);
+      }
     }
-    printf("\n");
   }
 
-  printf("%s vs strstr(ただいま)=%s\n", result, strstr(result, "ただいま"));
   /* 認識結果判定 */
-  if(strstr(result, "ただいま") == NULL) {
-    printf("tadaima ok\n");
+  if(strstr(ph_result, "tadaima") != NULL) {
+    printf("okaeri_kanojo: tadaima recognized\n");
   }
 #if ALWAYS_OUT_MFCC_TO_FILE != 1
   else {
@@ -108,9 +110,8 @@ void output_result(Recog *recog, void *dummy) {
 
   /* 話者認識器を呼ぶ. おかえり音声もここで再生される */
 #if ALWAYS_OUT_MFCC_TO_FILE != 1
-  sprintf(classification_cmd, CLASSIFIER_FILE " --testfile=%s", test_csv_name);
+  sprintf(classification_cmd, CLASSIFIER_FILE " " CLASSIFIER_PARAM " --testfile=%s", test_csv_name);
   system(classification_cmd);
-  printf("classification_cmd: %s\n", classification_cmd);
 
   remove(test_csv_name);
 #endif
