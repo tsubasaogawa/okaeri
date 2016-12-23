@@ -25,20 +25,15 @@ TRAIN_FILE = './train.csv'   # input training file
 MODEL_FILE = './train.model' # output model file
 # OPT_FILE   = './train.optimizer'
 
-def main():
-  parser = argparse.ArgumentParser(description='okaeri kanojo trainer')
-  parser.add_argument('--batchsize', '-b', type=int, default=100,
-            help='Number of images in each mini-batch')
-  parser.add_argument('--epoch', '-e', type=int, default=20,
-            help='Number of sweeps over the dataset to train')
-  parser.add_argument('--gpu', '-g', type=int, default=-1,
-            help='GPU ID (negative value indicates CPU)')
+def get_args(parser):
+  parser.add_argument('--batchsize', '-b', type=int, default=100)
+  parser.add_argument('--epoch', '-e', type=int, default=20)
+  parser.add_argument('--gpu', '-g', type=int, default=-1)
+  parser.add_argument('--unit', '-u', type=int, default=DEFAULT_UNIT)
   parser.add_argument('--out', '-o', default='result',
             help='Directory to output the result')
   parser.add_argument('--resume', '-r', default='',
             help='Resume the training from snapshot')
-  parser.add_argument('--unit', '-u', type=int, default=DEFAULT_UNIT,
-            help='Number of units')
   args = parser.parse_args()
 
   print('GPU: {}'.format(args.gpu))
@@ -46,6 +41,12 @@ def main():
   print('# Minibatch-size: {}'.format(args.batchsize))
   print('# epoch: {}'.format(args.epoch))
   print('')
+
+  return args
+
+def main():
+  parser = argparse.ArgumentParser(description='okaeri kanojo trainer')
+  args = get_args(parser)
 
   model = L.Classifier(mlp.MLP(N_IN, args.unit, N_OUT))
   if args.gpu >= 0:

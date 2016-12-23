@@ -27,12 +27,9 @@ N_OUT = 2  # out
 DEFAULT_UNIT = 500
 MODEL_FILE = './train.model'
 
-def main():
-  parser = argparse.ArgumentParser(description='okaeri kanojo classifier')
-  parser.add_argument('--gpu', '-g', type=int, default=-1,
-            help='GPU ID (negative value indicates CPU)')
-  parser.add_argument('--unit', '-u', type=int, default=DEFAULT_UNIT,
-            help='Number of units')
+def get_args(parser):
+  parser.add_argument('--gpu', '-g', type=int, default=-1)
+  parser.add_argument('--unit', '-u', type=int, default=DEFAULT_UNIT)
   parser.add_argument('--testfile', '-t', default='',
             help='Input test file')
   args = parser.parse_args()
@@ -42,6 +39,11 @@ def main():
     sys.exit(1)
 
   print('# test-file: {}'.format(args.testfile))
+  return args
+
+def main():
+  parser = argparse.ArgumentParser(description='okaeri kanojo classifier')
+  args = get_args(parser)
 
   model = L.Classifier(mlp.MLP(N_IN, args.unit, N_OUT))
   if args.gpu >= 0:
