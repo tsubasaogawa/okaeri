@@ -16,8 +16,9 @@ from chainer.datasets import tuple_dataset
 
 N_IN  = 25 # in
 N_OUT = 2  # out
-TRAIN_FILE = './train.csv' # training file
-MODEL_FILE = './train.model'
+DEFAULT_UNIT = 500
+TRAIN_FILE = './train.csv'   # input training file
+MODEL_FILE = './train.model' # output model file
 # OPT_FILE   = './train.optimizer'
 
 # Network definition
@@ -66,7 +67,7 @@ def main():
                         help='Directory to output the result')
     parser.add_argument('--resume', '-r', default='',
                         help='Resume the training from snapshot')
-    parser.add_argument('--unit', '-u', type=int, default=500,
+    parser.add_argument('--unit', '-u', type=int, default=DEFAULT_UNIT,
                         help='Number of units')
     args = parser.parse_args()
 

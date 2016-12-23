@@ -21,6 +21,7 @@ import play_okaeri
 
 N_IN  = 25 # in
 N_OUT = 2  # out
+DEFAULT_UNIT = 500
 MODEL_FILE = './train.model'
 
 # Network definition
@@ -61,11 +62,15 @@ def main():
     parser = argparse.ArgumentParser(description='okaeri kanojo classifier')
     parser.add_argument('--gpu', '-g', type=int, default=-1,
                         help='GPU ID (negative value indicates CPU)')
-    parser.add_argument('--unit', '-u', type=int, default=1000,
+    parser.add_argument('--unit', '-u', type=int, default=DEFAULT_UNIT,
                         help='Number of units')
     parser.add_argument('--testfile', '-t', default='',
                         help='Input test file')
     args = parser.parse_args()
+
+    if args.testfile == '':
+        print('no input file')
+        sys.exit(1)
 
     print('# test-file: {}'.format(args.testfile))
 
