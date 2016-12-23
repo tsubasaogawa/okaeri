@@ -108,7 +108,8 @@ void output_result(Recog *recog, void *dummy) {
 		  dt_data->tm_hour, dt_data->tm_min, dt_data->tm_sec);
   output_test_data_csv(test_csv_name, OKAERI_CLASS, avg_mfcc, mfcclen);
 
-  /* 話者認識器を呼ぶ. おかえり音声もここで再生される */
+  /* 話者認識器を呼ぶ. おかえり音声もここで再生される
+   * 余談: 本当はプラグイン側で音声再生させたかったが余力がなく TODO */
 #if ALWAYS_OUT_MFCC_TO_FILE != 1
   sprintf(classification_cmd, CLASSIFIER_FILE " " CLASSIFIER_PARAM " --testfile=%s", test_csv_name);
   system(classification_cmd);
