@@ -10,7 +10,6 @@ OKAERI_FILE = './voice-okaeri-yasashime.wav'
 
 def play():
   winsound.PlaySound(OKAERI_FILE, winsound.SND_FILENAME)
-  print("okaeried")
 
 if __name__ == '__main__':
   play()
