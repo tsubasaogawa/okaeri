@@ -16,3 +16,7 @@ $(PROGNAME).jpi : $(PROGNAME).o
 $(PROGNAME).o : $(PROGNAME).c
 	$(CC) -c $(PROGNAME).c -Wall -I$(IDIR1) -I$(IDIR2) $(DEFINES)
 
+.PHONY: clean
+clean :
+	-rm $(PROGNAME).jpi $(PROGNAME).o
+
